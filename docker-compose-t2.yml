@@ -84,13 +84,6 @@ services:
       - 8920:8920 #optional
       - 7359:7359/udp #optional
 #      - 1900:1900/udp #optional
-#    devices:
-#      - /dev/dri:/dev/dri #optional
-#      - /dev/vcsm:/dev/vcsm #optional
-#      - /dev/vchiq:/dev/vchiq #optional
-#      - /dev/video10:/dev/video10 #optional
-#      - /dev/video11:/dev/video11 #optional
-#      - /dev/video12:/dev/video12 #optional
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -120,8 +113,6 @@ services:
     restart: unless-stopped
     networks:
       - docker_default
-#    security_opt:
-#      - no-new-privileges:true
     volumes:
       - ${USERDIR}/docker/oauth:/config
     environment:
@@ -287,9 +278,6 @@ services:
       - "traefik.http.routers.sonarr-rtr.priority=99"
       ## Middlewares
       - "traefik.http.routers.sonarr-rtr.middlewares=chain-oauth@file"
-#      - "traefik.http.routers.sonarr-rtr.middlewares=middlewares-basic-auth@file"
-#      - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
-#      - "traefik.http.routers.sonarr-rtr.middlewares=chain-oauth@file"
       ## HTTP Services
       - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
       - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
@@ -310,8 +298,6 @@ services:
       - "8000:8000"
     restart: always
     environment:
-#      - PUID=$PUID
-#      - PGID=$PGID
       - TZ=$TZ
     labels:
       - "traefik.enable=true"
@@ -444,19 +430,6 @@ services:
     image: "linuxserver/plex:latest"
     container_name: "plex"
     network_mode: host
-
-#    ports:
-#      - 32400:32400/tcp
-#      - 32400:32400/udp
-#      - 3005:3005/tcp
-#      - 8324:8324/tcp
-#      - 32469:32469/tcp
-#      - 1900:1900/udp
-#      - 32410:32410/udp
-#      - 32412:32412/udp
-#      - 32413:32413/udp
-#      - 32414:32414/udp
-
     volumes:
       - ${USERDIR}/docker/plex:/config
       - ${USERDIR}/docker/tv:/tv
@@ -496,7 +469,7 @@ services:
 #      - --entryPoints.web.address=:80
       - --entryPoints.https.address=:443
 #      - --entryPoints.websecure.address=:443
-        # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
+# Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
       - --entrypoints.https.forwardedHeaders.trustedIPs=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/12,172.64.0.0/13,131.0.72.0/22
       - --entryPoints.traefik.address=:8080
       - --api=true
@@ -515,21 +488,14 @@ services:
       - --providers.docker.network=docker_default
       - --providers.docker.swarmMode=false
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory.
-#      - --providers.file.filename=/path/to/file # Load dynamic configuration from a file.
       - --providers.file.watch=true # Only works on top level files in the rules folder
 #      - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
 
-#    networks:
-#      t2_proxy:
-#        ipv4_address: 192.168.90.254 # You can specify a static IP
     networks:
       - docker_default
-
-#    security_opt:
-#      - no-new-privileges:true
 
     ports:
       - target: 80
@@ -569,28 +535,16 @@ services:
       - "traefik.http.routers.traefik-rtr.entrypoints=https"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
       - "traefik.http.routers.traefik-rtr.tls=true"
-#      - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       - "traefik.http.routers.traefik-rtr.tls.domains[0].main=$DOMAINNAME"
       - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.$DOMAINNAME"
-#      - "traefik.http.routers.traefik-rtr.tls.domains[1].main=$SECONDDOMAINNAME" # Pulls main cert for second domain
-#      - "traefik.http.routers.traefik-rtr.tls.domains[1].sans=*.$SECONDDOMAINNAME" # Pulls wildcard cert for second domain
-
       ## Services - API
       - "traefik.http.routers.traefik-rtr.service=api@internal"
-
       ## Middlewares
-#      - "traefik.http.routers.sonarr-docker.middlewares=middlewares-basic-auth@file" 
-#      - "traefik.http.routers.traefik-rtr.middlewares=middlewares-secure-headers@file,middlewares-rate-limit@file,middlewares-basic-auth@file" 
-#      - "traefik.http.routers.traefik-rtr.middlewares=middlewares-basic-auth@file" 
-#      - "traefik.http.routers.traefik-rtr.middlewares=chain-basic-auth@file"
       - "traefik.http.routers.traefik-rtr.middlewares=chain-oauth@file"
 ## Router      
       - "traefik.http.routers.edgerouter.entrypoints=https"
       - "traefik.http.routers.edgerouter.rule=Host(`router.ovesen.io`)"
       - "traefik.http.routers.edgerouter.tls=true"
       - "traefik.http.routers.edgerouter.middlewares=chain-oauth@file"
-#      - "traefik.http.routers.edgerouter.service=sonarr-svc"
-#      - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
-#      - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
       - "traefik.docker.network=docker_default"
 
