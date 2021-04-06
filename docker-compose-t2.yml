@@ -442,14 +442,14 @@ services:
       - ${USERDIR}/docker/shared:/shared
     restart: unless-stopped
     environment:
-      - ADVERTISE_IP=https://plex.ovesen.io:443
+      - ADVERTISE_IP=https://plex.$DOMAINNAME:443
       - PUID=1001
       - PGID=1002
       - TZ=$TZ
       - VERSION=docker
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.plex.rule=Host(`plex.ovesen.io`)"
+      - "traefik.http.routers.plex.rule=Host(`plex.$DOMAINNAME`)"
       - "traefik.http.routers.plex.entrypoints=https"
       - "traefik.http.routers.plex.tls.certresolver=mydnschallenge"
       - "traefik.http.services.plex.loadbalancer.server.port=32400"
@@ -543,7 +543,7 @@ services:
       - "traefik.http.routers.traefik-rtr.middlewares=chain-oauth@file"
 ## Router      
       - "traefik.http.routers.edgerouter.entrypoints=https"
-      - "traefik.http.routers.edgerouter.rule=Host(`router.ovesen.io`)"
+      - "traefik.http.routers.edgerouter.rule=Host(`router.$DOMAINNAME`)"
       - "traefik.http.routers.edgerouter.tls=true"
       - "traefik.http.routers.edgerouter.middlewares=chain-oauth@file"
       - "traefik.docker.network=docker_default"
